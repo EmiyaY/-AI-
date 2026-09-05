@@ -741,6 +741,84 @@
     }
   }
 
+  /* ===== 自动处理变量（消息生成后自动用第二 API 精修变量） ===== */
+  var AUTO_SYSTEM = '你是变量更新助手。根据正文和当前变量数据，判断需要更新的变量，只输出一段 <UpdateVariable>…</UpdateVariable>，内为 RFC 6902 JSON Patch 数组（op 仅 replace/add/remove/move，禁止 delta）。若无需改动输出 <UpdateVariable>[]</UpdateVariable>。不要输出正文、解释或其他内容。\n\n变量结构（path 严格遵守）：游戏时间{纪历体系,纪年名称,纪年年数,时间演算基底,年,月,日,时,分}；元信息{玩家名称,玩家身份,玩家当前状态,当前阶段,世界类型,世界简介,进度,最近更新时间}；当前场景{所在地点,环境氛围,人员动态}；可能意外{可能的人,可能的结果}；角色档案{[CHR-xxx]{姓名,状态,角色简介,当前内心想法,性格,身体信息{年龄,身高,体重,外貌描述,色气点},穿搭{外穿,内搭,装饰,色气点},性爱观念{性爱观,接受条件,偏好},携带物品{[物品]{状态,描述}},数值{好感度},与User关系}}；剧情记录{[场景标识]{地点,环境,功能,开场白,进行中任务}}；游戏状态{[状态名]值}。';
+
+  var autoEnabled = true;
+  var autoBusy = false;
+  var lastAutoKey = '';
+
+  function applyVariablePatch(patchBlock, msgId) {
+    var setMsgs = getGlobalFn('setChatMessages');
+    var getMsgs = getGlobalFn('getChatMessages');
+    if (!setMsgs || !getMsgs) return false;
+    try {
+      var msgs = getMsgs(msgId);
+      if (!msgs || !msgs.length) return false;
+      var orig = String(msgs[0].message || msgs[0].mes || '');
+      var cleaned = orig.replace(/<UpdateVariable>[\s\S]*?<\/UpdateVariable>/gi, '').trim();
+      var newMsg = cleaned + '\n\n' + patchBlock;
+      setMsgs([{ message_id: msgId, message: newMsg }], { refresh: 'affected' });
+      var ST = window.SillyTavern || (window.parent && window.parent.SillyTavern);
+      if (ST && typeof ST.saveChat === 'function') { try { ST.saveChat(); } catch (e) { /* ignore */ } }
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function autoProcessVariable(msgId, body) {
+    if (!autoEnabled || autoBusy) return;
+    autoBusy = true;
+    var d = getMvuData();
+    var userContent = '<maintext>\n' + body + '\n</maintext>\n\n当前变量数据（JSON）：\n' + JSON.stringify(d || {});
+    callSecondApi(AUTO_SYSTEM, userContent)
+      .then(function (resp) {
+        var m = String(resp || '').match(/<UpdateVariable>[\s\S]*?<\/UpdateVariable>/i);
+        if (!m) throw new Error('响应未包含 UpdateVariable');
+        var block = m[0].trim();
+        if (/\[\s*\]/.test(block.replace(/<[^>]+>/g, ''))) return;
+        if (applyVariablePatch(block, msgId)) {
+          setStatus('variable-status', '已自动更新变量');
+        } else {
+          setStatus('variable-status', '自动更新失败：无法写入消息', true);
+        }
+      })
+      .catch(function (e) {
+        setStatus('variable-status', '自动处理失败：' + (e && e.message ? e.message : e), true);
+      })
+      .then(function () { autoBusy = false; });
+  }
+
+  function detectNewAiMessage() {
+    var getMsgs = getGlobalFn('getChatMessages');
+    if (!getMsgs) return;
+    try {
+      var msgs = getMsgs('latest');
+      if (!msgs || !msgs.length) return;
+      var last = msgs[0];
+      if (last.is_user === true) return;
+      var body = String(last.message || last.mes || '');
+      if (!body.trim()) return;
+      var key = (last.message_id || '') + ':' + body.length;
+      if (key === lastAutoKey) return;
+      lastAutoKey = key;
+      autoProcessVariable(last.message_id || 0, body);
+    } catch (e) { /* ignore */ }
+  }
+
+  function setupAutoTrigger() {
+    try {
+      var eventOn = getGlobalFn('eventOn');
+      var te = window.tavern_events || (window.parent && window.parent.tavern_events);
+      if (eventOn && te && te.MESSAGE_RECEIVED) {
+        eventOn(te.MESSAGE_RECEIVED, function () {
+          setTimeout(detectNewAiMessage, 1000);
+        });
+        return;
+      }
+    } catch (e) { /* ignore */ }
+    setInterval(detectNewAiMessage, 4000);
+  }
+
   function bindEvents() {
     document.getElementById('gear-btn').addEventListener('click', function () {
       document.getElementById('settings').classList.toggle('open');
@@ -781,6 +859,7 @@
       bindEvents();
       render();
       setInterval(render, 5000);
+      setupAutoTrigger();
     } catch (e) { /* ignore */ }
   }
 
