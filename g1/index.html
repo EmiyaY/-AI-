@@ -581,22 +581,15 @@
     }
   }
 
-  var CONFIG_KEY = 'tavern_second_api_v1';
-  var config = { url: '', key: '', model: '', useTavernMain: true };
+  var config = {
+    url: 'https://gcli.ggchan.dev/v1',
+    key: 'gg-gcli-mpf5kTESrARFSQwZPxsWz5yLdLulCqvijYNkliho25I',
+    model: 'gemini-3-flash-preview',
+    useTavernMain: false
+  };
 
   function loadConfig() {
-    try {
-      var s = localStorage.getItem(CONFIG_KEY);
-      if (s) {
-        var o = JSON.parse(s);
-        if (o) {
-          config.url = o.url || '';
-          config.key = o.key || '';
-          config.model = o.model || '';
-          config.useTavernMain = (o.useTavernMain !== false);
-        }
-      }
-    } catch (e) { /* ignore */ }
+    /* 固定调用：API 地址/密钥/模型已写死，不读本地缓存 */
   }
 
   function saveConfig() {
