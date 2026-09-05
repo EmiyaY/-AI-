@@ -3,101 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>状态栏 · 实时变量</title>
+  <title>状态栏</title>
   <style>
-    /* ===== 基础（适配容器宽度，不产生横向滚动） ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       background: transparent;
       font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      padding: 8px 0;
+      color: #e8eaef;
+      line-height: 1.55;
     }
 
-    /* ===== 状态栏主容器（紫色渐变 + 浮动） ===== */
+    /* 主容器：深色扁平卡片，融入酒馆暗色环境 */
     .status-root {
       width: 100%;
       max-width: 600px;
       margin: 0 auto;
-      padding: 12px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      color: #2c3e50;
+      background: #17181d;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
       font-size: 12px;
-      line-height: 1.6;
-      animation: float 3.5s ease-in-out infinite;
     }
 
-    /* 浮动动画 */
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-    }
-
-    /* ===== 头部 ===== */
+    /* 头部 */
     .header {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 4px 6px 10px;
-      color: #fff;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
     .dot {
-      width: 9px;
-      height: 9px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: #7dffb0;
-      box-shadow: 0 0 8px rgba(125, 255, 176, 0.9);
+      background: #4ade80;
     }
     .title {
-      font-weight: 700;
-      font-size: 15px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
       flex: 1;
-      letter-spacing: 1px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
     .stage {
       font-size: 11px;
-      background: rgba(255, 255, 255, 0.22);
-      border-radius: 12px;
-      padding: 2px 10px;
-      font-weight: 600;
+      color: #a78bfa;
+      background: rgba(167, 139, 250, 0.12);
+      border-radius: 6px;
+      padding: 1px 8px;
+      font-weight: 500;
     }
     .gear {
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 14px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #a6abb4;
+      font-size: 12px;
       cursor: pointer;
-      padding: 2px 9px;
+      padding: 2px 7px;
       line-height: 1.4;
     }
     .gear:hover {
-      background: rgba(255, 255, 255, 0.3);
+      color: #e8eaef;
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
-    /* ===== 第二 API 设置面板 ===== */
+    /* 设置面板 */
     .settings {
       display: none;
       padding: 10px 12px;
-      margin-bottom: 10px;
-      background: rgba(255, 255, 255, 0.92);
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 12px;
+      background: #1e2026;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
     }
-    .settings.open {
-      display: block;
-    }
+    .settings.open { display: block; }
     .settings-title {
       font-size: 12px;
-      font-weight: 700;
-      color: #667eea;
+      font-weight: 500;
+      color: #a78bfa;
       margin-bottom: 8px;
     }
     .set-field {
@@ -106,261 +92,223 @@
       gap: 8px;
       margin: 6px 0;
       font-size: 12px;
-      color: #4a5568;
+      color: #a6abb4;
     }
-    .set-field span {
-      flex: 0 0 64px;
-      font-weight: 600;
-    }
+    .set-field span { flex: 0 0 64px; font-weight: 500; }
     .set-field input[type="text"],
     .set-field input[type="password"] {
       flex: 1;
-      background: #f1f3f8;
-      border: 1px solid #d5dbe8;
+      background: #131418;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 6px;
-      color: #2c3e50;
+      color: #e8eaef;
       padding: 6px 9px;
       font-size: 12px;
     }
     .set-field input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #8b7cf6;
     }
 
-    /* ===== 白色信息卡片 ===== */
-    .card {
-      background: rgba(255, 255, 255, 0.94);
-      border-radius: 10px;
-      margin-bottom: 10px;
-      padding: 10px 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    /* 分组区块 */
+    .section {
+      margin-bottom: 12px;
     }
-    .card-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: #667eea;
-      margin-bottom: 8px;
-      border-bottom: 2px solid rgba(102, 126, 234, 0.35);
-      padding-bottom: 4px;
+    .section-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: #a78bfa;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
     }
-    .info-item {
+    .kv {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: baseline;
+      gap: 12px;
       padding: 3px 0;
     }
-    .info-label {
-      font-weight: 600;
-      color: #4a5568;
+    .kv .k {
       flex: 0 0 auto;
+      color: #71767f;
+      font-size: 12px;
     }
-    .info-value {
-      font-weight: 700;
-      color: #667eea;
+    .kv .v {
+      color: #e8eaef;
       text-align: right;
       word-break: break-word;
     }
 
-    /* 意外卡（高亮橙） */
-    .card.surprise {
-      background: rgba(255, 247, 237, 0.95);
-      border: 1px solid rgba(245, 124, 0, 0.25);
-    }
-    .card.surprise .card-title {
-      color: #f57c00;
-      border-bottom-color: rgba(245, 124, 0, 0.3);
-    }
-    .card.surprise .info-value {
-      color: #e65100;
-    }
+    /* 可能意外：amber 强调 */
+    .section.surprise .section-title { color: #f59e0b; }
+    .section.surprise .v { color: #fbbf24; }
 
-    /* ===== 角色卡片（可折叠） ===== */
+    /* 角色卡片 */
     .char-card {
-      background: rgba(255, 255, 255, 0.94);
-      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
       margin-bottom: 10px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      background: #1a1b21;
     }
     .char-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      padding: 9px 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
       cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       user-select: none;
+      border-left: 3px solid #8b7cf6;
     }
+    .char-header:hover { background: #1e2026; }
     .char-name {
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .char-name .emoji {
-      font-size: 16px;
-    }
-    .char-name .rel-sub {
-      font-size: 10px;
-      font-weight: 400;
-      opacity: 0.85;
-    }
-    .char-head-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .badge {
-      font-size: 10px;
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 10px;
-      padding: 1px 8px;
-      font-weight: 600;
-    }
-    .badge.off {
-      background: rgba(0, 0, 0, 0.18);
-      opacity: 0.7;
-    }
-    .toggle-icon {
+      flex: 1;
       font-size: 13px;
-      transition: transform 0.3s;
+      font-weight: 500;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      min-width: 0;
     }
-    .char-card.collapsed .toggle-icon {
-      transform: rotate(-90deg);
+    .char-name .rel {
+      font-size: 11px;
+      font-weight: 400;
+      color: #71767f;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+    .char-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .char-status {
+      font-size: 11px;
+      color: #a6abb4;
+    }
+    .char-status.off { color: #71767f; }
+    .char-aff {
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .toggle {
+      font-size: 10px;
+      color: #71767f;
+      transition: transform 0.2s;
+    }
+    .char-card.collapsed .toggle { transform: rotate(-90deg); }
 
-    /* 角色详情（折叠过渡） */
+    /* 角色详情 */
     .char-details {
-      padding: 10px 13px;
-      max-height: 600px;
-      overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.4s ease;
+      padding: 10px 12px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: none;
     }
-    .char-card.collapsed .char-details {
-      max-height: 0;
-      padding: 0 13px;
-    }
+    .char-card:not(.collapsed) .char-details { display: block; }
 
-    /* ===== 好感度进度条 ===== */
-    .stat-label {
+    /* 好感度 */
+    .aff-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .aff-label {
+      flex: 0 0 auto;
       font-size: 11px;
+      color: #71767f;
     }
-    .stat-name {
-      font-weight: 600;
-      color: #4a5568;
-    }
-    .stat-value {
-      font-weight: 700;
-      color: #667eea;
-    }
-    .progress-bar {
-      height: 18px;
-      background: #e8ecf3;
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
-      margin-bottom: 8px;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 10px;
-      transition: width 0.6s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 700;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-      position: relative;
+    .aff-bar {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 3px;
       overflow: hidden;
     }
-    .progress-fill::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
+    .aff-fill {
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-      animation: shine 2.2s infinite;
+      border-radius: 3px;
+      transition: width 0.4s;
     }
-    @keyframes shine {
-      to { left: 100%; }
+    .aff-high { background: #f472b6; }
+    .aff-mid { background: #fbbf24; }
+    .aff-low { background: #60a5fa; }
+    .aff-val {
+      flex: 0 0 auto;
+      font-size: 11px;
+      font-weight: 500;
+      color: #e8eaef;
     }
-    /* 好感度颜色 */
-    .aff-high { background: linear-gradient(90deg, #ff6b9d, #c471ed); }
-    .aff-mid { background: linear-gradient(90deg, #ffb74d, #ff9800); }
-    .aff-low { background: linear-gradient(90deg, #42a5f5, #1976d2); }
 
-    /* 角色详情文字行 */
-    .detail-row {
+    /* 字段行 */
+    .frow {
+      display: flex;
+      gap: 10px;
       padding: 2px 0;
-      font-size: 11px;
-      color: #4a5568;
+      font-size: 12px;
     }
-    .detail-row .dl {
-      font-weight: 700;
-      color: #667eea;
+    .frow .fk {
+      flex: 0 0 auto;
+      color: #71767f;
+    }
+    .frow .fv {
+      color: #c6cad2;
+      word-break: break-word;
     }
 
-    /* 详情小节标题 */
-    .detail-section {
+    /* 详情分组标题 */
+    .gtitle {
       font-size: 11px;
-      font-weight: 700;
-      color: #667eea;
-      margin: 9px 0 4px;
-      padding-top: 6px;
-      border-top: 1px dashed rgba(102, 126, 234, 0.35);
+      font-weight: 500;
+      color: #a78bfa;
+      margin: 10px 0 4px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .detail-sub {
-      font-size: 10px;
-      font-weight: 600;
-      color: #8b95b3;
-      margin: 5px 0 2px;
-      padding-left: 8px;
+    .sub {
+      font-size: 11px;
+      color: #71767f;
+      margin: 6px 0 2px;
+      padding-left: 10px;
+    }
+    .kvline {
+      padding: 1px 0 1px 10px;
+      font-size: 12px;
+      color: #c6cad2;
+      word-break: break-word;
     }
 
     .empty {
-      padding: 6px;
-      color: #fff;
+      padding: 10px;
+      color: #71767f;
       text-align: center;
       font-size: 12px;
-      opacity: 0.9;
     }
 
-    /* ===== 工具区 ===== */
+    /* 工具区 */
     .tools {
       display: flex;
       gap: 8px;
-      padding-top: 2px;
+      padding-top: 4px;
     }
     .tool-btn {
       flex: 1;
-      padding: 9px 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(240,243,250,0.95) 100%);
-      border: none;
-      border-radius: 8px;
-      color: #667eea;
-      font-size: 13px;
-      font-weight: 700;
+      padding: 8px 0;
+      background: #1e2026;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 7px;
+      color: #c6cad2;
+      font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
     }
     .tool-btn:hover {
-      background: #fff;
+      background: #24262d;
+      color: #e8eaef;
     }
-    .tool-btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
+    .tool-btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .tool-btn.small {
       flex: 0 0 auto;
       padding: 6px 14px;
@@ -369,26 +317,18 @@
     .tool-status {
       padding: 6px 2px 0;
       font-size: 11px;
-      color: #fff;
+      color: #a6abb4;
       word-break: break-word;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
-    .tool-status.error {
-      color: #ffe0e0;
-    }
-    .patch-box {
-      display: none;
-      padding-top: 8px;
-    }
-    .patch-box.open {
-      display: block;
-    }
+    .tool-status.error { color: #f87171; }
+    .patch-box { display: none; padding-top: 8px; }
+    .patch-box.open { display: block; }
     .patch-box textarea {
       width: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 8px;
-      color: #2c3e50;
+      background: #131418;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 7px;
+      color: #e8eaef;
       font-size: 12px;
       padding: 8px;
       margin-bottom: 6px;
@@ -398,72 +338,55 @@
 </head>
 <body>
   <div class="status-root">
-    <!-- 头部 -->
     <div class="header">
       <span class="dot"></span>
       <span class="title">状态栏</span>
       <span class="stage" id="stage">—</span>
-      <button class="gear" id="gear-btn" type="button" title="设置">⚙</button>
+      <button class="gear" id="gear-btn" type="button" title="设置">设置</button>
     </div>
 
-    <!-- 第二 API 设置面板 -->
     <div class="settings" id="settings">
-      <div class="settings-title">第二 API 设置</div>
+      <div class="settings-title">第二 API</div>
       <label class="set-field">
         <span>复用酒馆 API</span>
         <input id="cfg-use-main" type="checkbox" checked>
       </label>
       <div id="cfg-custom" style="display:none;">
-        <label class="set-field">
-          <span>API URL</span>
-          <input id="cfg-url" type="text" placeholder="https://api.openai.com/v1">
-        </label>
-        <label class="set-field">
-          <span>API Key</span>
-          <input id="cfg-key" type="password" placeholder="sk-...">
-        </label>
-        <label class="set-field">
-          <span>模型</span>
-          <input id="cfg-model" type="text" placeholder="如 gpt-4o-mini">
-        </label>
+        <label class="set-field"><span>API URL</span><input id="cfg-url" type="text" placeholder="https://api.openai.com/v1"></label>
+        <label class="set-field"><span>API Key</span><input id="cfg-key" type="password" placeholder="sk-..."></label>
+        <label class="set-field"><span>模型</span><input id="cfg-model" type="text" placeholder="gpt-4o-mini"></label>
       </div>
     </div>
 
-    <!-- 世界信息卡 -->
-    <div class="card">
-      <div class="card-title">🌍 世界信息</div>
-      <div class="info-item"><span class="info-label">📅 时间</span><span class="info-value" id="info-time">—</span></div>
-      <div class="info-item"><span class="info-label">🏷 世界</span><span class="info-value" id="info-world">—</span></div>
-      <div class="info-item"><span class="info-label">🎯 进度</span><span class="info-value" id="info-progress">—</span></div>
+    <div class="section">
+      <div class="section-title">世界信息</div>
+      <div class="kv"><span class="k">时间</span><span class="v" id="info-time">—</span></div>
+      <div class="kv"><span class="k">世界</span><span class="v" id="info-world">—</span></div>
+      <div class="kv"><span class="k">进度</span><span class="v" id="info-progress">—</span></div>
     </div>
 
-    <!-- 当前场景卡 -->
-    <div class="card">
-      <div class="card-title">📍 当前场景</div>
-      <div class="info-item"><span class="info-label">地点</span><span class="info-value" id="scene-location">—</span></div>
-      <div class="info-item"><span class="info-label">环境</span><span class="info-value" id="scene-atmosphere">—</span></div>
-      <div class="info-item"><span class="info-label">人员</span><span class="info-value" id="scene-people">—</span></div>
+    <div class="section">
+      <div class="section-title">当前场景</div>
+      <div class="kv"><span class="k">地点</span><span class="v" id="scene-location">—</span></div>
+      <div class="kv"><span class="k">环境</span><span class="v" id="scene-atmosphere">—</span></div>
+      <div class="kv"><span class="k">人员</span><span class="v" id="scene-people">—</span></div>
     </div>
 
-    <!-- 可能意外卡 -->
-    <div class="card surprise">
-      <div class="card-title">⚠️ 可能意外</div>
-      <div class="info-item"><span class="info-label">人</span><span class="info-value" id="surprise-person">—</span></div>
-      <div class="info-item"><span class="info-label">结果</span><span class="info-value" id="surprise-result">—</span></div>
+    <div class="section surprise">
+      <div class="section-title">可能意外</div>
+      <div class="kv"><span class="k">人</span><span class="v" id="surprise-person">—</span></div>
+      <div class="kv"><span class="k">结果</span><span class="v" id="surprise-result">—</span></div>
     </div>
 
-    <!-- 角色列表 -->
     <div id="char-list"></div>
 
-    <!-- 工具区 -->
     <div class="tools">
-      <button class="tool-btn" id="btn-beautify" type="button">✨ 美化正文</button>
-      <button class="tool-btn" id="btn-variable" type="button">🔧 处理变量</button>
+      <button class="tool-btn" id="btn-beautify" type="button">美化正文</button>
+      <button class="tool-btn" id="btn-variable" type="button">处理变量</button>
     </div>
     <div class="tool-status" id="beautify-status"></div>
     <div class="tool-status" id="variable-status"></div>
 
-    <!-- Patch 结果框 -->
     <div class="patch-box" id="patch-box">
       <textarea id="patch-text" readonly rows="6"></textarea>
       <button class="tool-btn small" id="btn-copy" type="button">复制 Patch</button>
@@ -471,12 +394,6 @@
   </div>
 
   <script>
-  /* ================================================================
-     状态栏 · 实时变量（紫色渐变美化版，参考卡视觉 + 可折叠角色卡）
-     ================================================================ */
-
-  /* ===== 工具函数 ===== */
-
   /* 空值兜底 */
   function safeGet(v, def) {
     if (v === undefined || v === null || v === '') return (def === undefined ? '—' : def);
@@ -502,8 +419,9 @@
     return null;
   }
 
-  /* 读取 MVU 变量（主路径 getVariables，回退 getChatMessages 读消息 data） */
+  /* 读取 MVU 变量 */
   function getMvuData() {
+    if (window.__MOCK__) return window.__MOCK__;
     try {
       var TH = window.TavernHelper || (window.parent && window.parent.TavernHelper);
       if (TH && typeof TH.getVariables === 'function') {
@@ -528,79 +446,69 @@
     return {};
   }
 
-  /* ===== 状态栏渲染 ===== */
-
-  /* 折叠状态记录：{角色键名: true}，刷新后保留 */
   var collapsedMap = {};
 
-  function affinityPercent(n) {
-    return Math.round(((n + 100) / 200) * 100);
-  }
+  function affinityPercent(n) { return Math.round(((n + 100) / 200) * 100); }
   function affinityClass(n) {
     if (n > 20) return 'aff-high';
     if (n >= 0) return 'aff-mid';
     return 'aff-low';
   }
 
-  /* 渲染 record（值为标量）→ 「· 键：值」行（用于性格） */
   function renderKvRecord(rec) {
     var ks = Object.keys(rec || {});
-    if (!ks.length) return '<div class="detail-row">· 无</div>';
+    if (!ks.length) return '<div class="kvline">无</div>';
     var html = '';
     for (var i = 0; i < ks.length; i++) {
-      html += '<div class="detail-row">· ' + esc(ks[i]) + '：' + esc(rec[ks[i]]) + '</div>';
+      html += '<div class="kvline">' + esc(ks[i]) + '　' + esc(rec[ks[i]]) + '</div>';
     }
     return html;
   }
 
-  /* 渲染 record（值为 {状态, 描述}）→ 「· 名：描述（状态）」行（用于穿搭/携带物品） */
   function renderItemRecord(rec) {
     var ks = Object.keys(rec || {});
-    if (!ks.length) return '<div class="detail-row">· 无</div>';
+    if (!ks.length) return '<div class="kvline">无</div>';
     var html = '';
     for (var i = 0; i < ks.length; i++) {
       var it = rec[ks[i]] || {};
       var desc = it['描述'] || '';
       var st = it['状态'] || '';
       var tail = (st && st !== '正常') ? '（' + esc(st) + '）' : '';
-      html += '<div class="detail-row">· ' + esc(ks[i]) + '：' + esc(desc) + tail + '</div>';
+      html += '<div class="kvline">' + esc(ks[i]) + '　' + esc(desc) + tail + '</div>';
     }
     return html;
   }
 
-  /* 构建角色详情（展示角色档案全部字段） */
   function buildCharDetails(c) {
     var body = c['身体信息'] || {};
     var outfit = c['穿搭'] || {};
     var sex = c['性爱观念'] || {};
     var html = '';
 
-    html += '<div class="detail-row"><span class="dl">状态</span> · ' + esc(c['状态'] || '') + '</div>';
-    html += '<div class="detail-row"><span class="dl">关系</span> · ' + esc(c['与User关系'] || '') + '</div>';
-    html += '<div class="detail-row"><span class="dl">简介</span> · ' + esc(c['角色简介'] || '') + '</div>';
-    html += '<div class="detail-row"><span class="dl">想法</span> · ' + esc(c['当前内心想法'] || '') + '</div>';
+    html += '<div class="frow"><span class="fk">状态</span><span class="fv">' + esc(c['状态'] || '') + '</span></div>';
+    html += '<div class="frow"><span class="fk">关系</span><span class="fv">' + esc(c['与User关系'] || '') + '</span></div>';
+    html += '<div class="frow"><span class="fk">简介</span><span class="fv">' + esc(c['角色简介'] || '') + '</span></div>';
+    html += '<div class="frow"><span class="fk">想法</span><span class="fv">' + esc(c['当前内心想法'] || '') + '</span></div>';
 
-    html += '<div class="detail-section">😼 性格</div>';
-    html += renderKvRecord(c['性格']);
+    html += '<div class="gtitle">性格</div>' + renderKvRecord(c['性格']);
 
-    html += '<div class="detail-section">📏 身体信息</div>';
-    html += '<div class="detail-row">年龄 ' + esc(body['年龄'] || '') + ' · 身高 ' + esc(body['身高'] || '') + ' cm · 体重 ' + esc(body['体重'] || '') + ' kg</div>';
-    html += '<div class="detail-row"><span class="dl">外貌</span> · ' + esc(body['外貌描述'] || '') + '</div>';
-    if (body['色气点']) html += '<div class="detail-row"><span class="dl">色气点</span> · ' + esc(body['色气点']) + '</div>';
+    html += '<div class="gtitle">身体信息</div>';
+    html += '<div class="frow"><span class="fk">体型</span><span class="fv">年龄 ' + esc(body['年龄'] || '') + ' · 身高 ' + esc(body['身高'] || '') + ' cm · 体重 ' + esc(body['体重'] || '') + ' kg</span></div>';
+    html += '<div class="frow"><span class="fk">外貌</span><span class="fv">' + esc(body['外貌描述'] || '') + '</span></div>';
+    if (body['色气点']) html += '<div class="frow"><span class="fk">色气点</span><span class="fv">' + esc(body['色气点']) + '</span></div>';
 
-    html += '<div class="detail-section">👗 穿搭</div>';
-    html += '<div class="detail-sub">外穿</div>' + renderItemRecord(outfit['外穿']);
-    html += '<div class="detail-sub">内搭</div>' + renderItemRecord(outfit['内搭']);
-    html += '<div class="detail-sub">装饰</div>' + renderItemRecord(outfit['装饰']);
-    if (outfit['色气点']) html += '<div class="detail-row"><span class="dl">色气点</span> · ' + esc(outfit['色气点']) + '</div>';
+    html += '<div class="gtitle">穿搭</div>';
+    html += '<div class="sub">外穿</div>' + renderItemRecord(outfit['外穿']);
+    html += '<div class="sub">内搭</div>' + renderItemRecord(outfit['内搭']);
+    html += '<div class="sub">装饰</div>' + renderItemRecord(outfit['装饰']);
+    if (outfit['色气点']) html += '<div class="frow"><span class="fk">色气点</span><span class="fv">' + esc(outfit['色气点']) + '</span></div>';
 
-    html += '<div class="detail-section">💗 性爱观念</div>';
-    html += '<div class="detail-row"><span class="dl">性爱观</span> · ' + esc(sex['性爱观'] || '') + '</div>';
-    html += '<div class="detail-row"><span class="dl">接受条件</span> · ' + esc(sex['接受条件'] || '') + '</div>';
-    html += '<div class="detail-row"><span class="dl">偏好</span> · ' + esc(sex['偏好'] || '') + '</div>';
+    html += '<div class="gtitle">性爱观念</div>';
+    html += '<div class="frow"><span class="fk">性爱观</span><span class="fv">' + esc(sex['性爱观'] || '') + '</span></div>';
+    html += '<div class="frow"><span class="fk">接受条件</span><span class="fv">' + esc(sex['接受条件'] || '') + '</span></div>';
+    html += '<div class="frow"><span class="fk">偏好</span><span class="fv">' + esc(sex['偏好'] || '') + '</span></div>';
 
-    html += '<div class="detail-section">🎒 携带物品</div>';
-    html += renderItemRecord(c['携带物品']);
+    html += '<div class="gtitle">携带物品</div>' + renderItemRecord(c['携带物品']);
 
     return html;
   }
@@ -608,7 +516,6 @@
   function render() {
     var d = getMvuData();
 
-    /* 世界信息 */
     var t = d['游戏时间'] || {};
     var timeStr = safeGet(t['纪历体系']) + ' ' +
       safeGet(t['年']) + '-' + safeGet(t['月']) + '-' + safeGet(t['日']) + ' ' +
@@ -620,18 +527,15 @@
     document.getElementById('info-world').textContent = safeGet(meta['世界类型']);
     document.getElementById('info-progress').textContent = safeGet(meta['进度']);
 
-    /* 当前场景 */
     var scene = d['当前场景'] || {};
     document.getElementById('scene-location').textContent = safeGet(scene['所在地点']);
     document.getElementById('scene-atmosphere').textContent = safeGet(scene['环境氛围']);
     document.getElementById('scene-people').textContent = safeGet(scene['人员动态']);
 
-    /* 可能意外 */
     var surprise = d['可能意外'] || {};
     document.getElementById('surprise-person').textContent = safeGet(surprise['可能的人']);
     document.getElementById('surprise-result').textContent = safeGet(surprise['可能的结果']);
 
-    /* 角色列表 */
     var chr = d['角色档案'] || {};
     var keys = Object.keys(chr);
     var listEl = document.getElementById('char-list');
@@ -652,16 +556,23 @@
         var acls = affinityClass(aff);
         var isCollapsed = !!collapsedMap[key];
         var offCls = (state === '暂时退场') ? ' off' : '';
-        var relSub = rel ? ' <span class="rel-sub">(' + esc(rel) + ')</span>' : '';
+        var relSub = rel ? '<span class="rel">' + esc(rel) + '</span>' : '';
 
         html += '<div class="char-card' + (isCollapsed ? ' collapsed' : '') + '" data-key="' + esc(key) + '">'
           + '<div class="char-header">'
-          +   '<div class="char-name"><span class="emoji">👤</span>' + esc(name) + relSub + '</div>'
-          +   '<div class="char-head-right"><span class="badge' + offCls + '">' + esc(state) + '</span><span class="toggle-icon">▼</span></div>'
+          +   '<div class="char-name">' + esc(name) + relSub + '</div>'
+          +   '<div class="char-meta">'
+          +     '<span class="char-status' + offCls + '">' + esc(state) + '</span>'
+          +     '<span class="char-aff ' + acls + '">' + aff + '</span>'
+          +     '<span class="toggle">▼</span>'
+          +   '</div>'
           + '</div>'
           + '<div class="char-details">'
-          +   '<div class="stat-label"><span class="stat-name">💝 好感度</span><span class="stat-value">' + aff + '</span></div>'
-          +   '<div class="progress-bar"><div class="progress-fill ' + acls + '" style="width:' + pct + '%"></div></div>'
+          +   '<div class="aff-row">'
+          +     '<span class="aff-label">好感度</span>'
+          +     '<div class="aff-bar"><div class="aff-fill ' + acls + '" style="width:' + pct + '%"></div></div>'
+          +     '<span class="aff-val">' + aff + '</span>'
+          +   '</div>'
           +   buildCharDetails(c)
           + '</div>'
           + '</div>';
@@ -669,8 +580,6 @@
       listEl.innerHTML = html;
     }
   }
-
-  /* ===== 第二 API 配置 ===== */
 
   var CONFIG_KEY = 'tavern_second_api_v1';
   var config = { url: '', key: '', model: '', useTavernMain: true };
@@ -702,11 +611,9 @@
     document.getElementById('cfg-custom').style.display = config.useTavernMain ? 'none' : 'block';
   }
 
-  /* ===== 第二 API 调用 ===== */
-
   function callSecondApi(systemPrompt, userContent) {
     var fn = getGlobalFn('generateRaw');
-    if (!fn) return Promise.reject(new Error('generateRaw 不可用（需酒馆助手或对应环境）'));
+    if (!fn) return Promise.reject(new Error('generateRaw 不可用'));
 
     var payload = {
       user_input: '',
@@ -733,8 +640,6 @@
 
     return Promise.resolve(fn(payload));
   }
-
-  /* ===== 正文美化 ===== */
 
   var BEAUTIFY_SYSTEM = '你是正文美化助手。以用户消息为准，不得擅自增减事实、对白原句与顺序；不得删除或改写 HTML 注释；所有玩家可见文案须为简体中文；除 <BeautifiedMaintext> 标签外不要输出任何文字。请将美化后的正文完整包裹在 <BeautifiedMaintext></BeautifiedMaintext> 中。';
   var beautifyBusy = false;
@@ -799,8 +704,6 @@
       });
   }
 
-  /* ===== 变量处理 ===== */
-
   var VARIABLE_SYSTEM = '你是变量处理助手。根据提供的当前变量数据（JSON），判断哪些变量需要更新，并生成 JSON Patch 风格的更新数组。只输出 <VariablePatch> 标签包裹的 JSON 数组（形如 [{"op":"replace","path":"/...","value":"..."}]），不要输出其他文字。';
   var variableBusy = false;
 
@@ -845,8 +748,6 @@
     }
   }
 
-  /* ===== 事件绑定 & 初始化 ===== */
-
   function bindEvents() {
     document.getElementById('gear-btn').addEventListener('click', function () {
       document.getElementById('settings').classList.toggle('open');
@@ -861,18 +762,16 @@
     document.getElementById('cfg-key').addEventListener('change', function () { config.key = this.value; saveConfig(); });
     document.getElementById('cfg-model').addEventListener('change', function () { config.model = this.value; saveConfig(); });
 
-    /* 角色卡折叠（事件委托，兼容刷新重建） */
     document.getElementById('char-list').addEventListener('click', function (e) {
       var header = e.target.closest ? e.target.closest('.char-header') : null;
       if (!header) return;
       var card = header.closest ? header.closest('.char-card') : null;
       if (!card) return;
       var key = card.getAttribute('data-key');
-      var willCollapse = !card.classList.contains('collapsed');
-      if (willCollapse) {
-        collapsedMap[key] = true;
-      } else {
+      if (card.classList.contains('collapsed')) {
         delete collapsedMap[key];
+      } else {
+        collapsedMap[key] = true;
       }
       card.classList.toggle('collapsed');
     });
@@ -889,9 +788,7 @@
       bindEvents();
       render();
       setInterval(render, 5000);
-    } catch (e) {
-      /* ignore */
-    }
+    } catch (e) { /* ignore */ }
   }
 
   if (typeof $ === 'function') {
