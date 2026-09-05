@@ -14,20 +14,29 @@
     body {
       background: transparent;
       font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      padding: 6px 0;
+      padding: 8px 0;
     }
 
-    /* ===== 状态栏卡片 ===== */
+    /* ===== 状态栏主容器（紫色渐变 + 浮动） ===== */
     .status-root {
       width: 100%;
-      max-width: 560px;
-      border: 1px solid #2a3247;
-      border-radius: 12px;
-      background: linear-gradient(180deg, #1a2030 0%, #151a26 100%);
-      color: #e2e8f0;
-      font-size: 13px;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 12px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #2c3e50;
+      font-size: 12px;
       line-height: 1.6;
-      overflow: hidden;
+      animation: float 3.5s ease-in-out infinite;
+    }
+
+    /* 浮动动画 */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
     }
 
     /* ===== 头部 ===== */
@@ -35,58 +44,60 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 14px;
-      border-bottom: 1px solid #2a3247;
-      background: rgba(91, 141, 239, 0.08);
+      padding: 4px 6px 10px;
+      color: #fff;
     }
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
-      background: #3fb27f;
-      box-shadow: 0 0 6px #3fb27f;
+      background: #7dffb0;
+      box-shadow: 0 0 8px rgba(125, 255, 176, 0.9);
     }
     .title {
-      font-weight: 600;
-      font-size: 14px;
+      font-weight: 700;
+      font-size: 15px;
       flex: 1;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
     .stage {
       font-size: 11px;
-      color: #5b8def;
-      border: 1px solid rgba(91, 141, 239, 0.4);
-      border-radius: 10px;
-      padding: 1px 8px;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-weight: 600;
     }
     .gear {
-      background: none;
-      border: 1px solid #2a3247;
-      border-radius: 6px;
-      color: #9aa8c0;
-      font-size: 13px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
       cursor: pointer;
-      padding: 2px 8px;
+      padding: 2px 9px;
       line-height: 1.4;
     }
     .gear:hover {
-      color: #e2e8f0;
-      border-color: #3a4358;
+      background: rgba(255, 255, 255, 0.3);
     }
 
     /* ===== 第二 API 设置面板 ===== */
     .settings {
       display: none;
-      padding: 10px 14px;
-      border-bottom: 1px solid #2a3247;
-      background: rgba(232, 160, 76, 0.04);
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
     .settings.open {
       display: block;
     }
     .settings-title {
       font-size: 12px;
-      font-weight: 600;
-      color: #e8a04c;
+      font-weight: 700;
+      color: #667eea;
       margin-bottom: 8px;
     }
     .set-field {
@@ -95,156 +106,242 @@
       gap: 8px;
       margin: 6px 0;
       font-size: 12px;
-      color: #9aa8c0;
+      color: #4a5568;
     }
     .set-field span {
-      flex: 0 0 60px;
+      flex: 0 0 64px;
+      font-weight: 600;
     }
     .set-field input[type="text"],
     .set-field input[type="password"] {
       flex: 1;
-      background: #1d2433;
-      border: 1px solid #2a3247;
+      background: #f1f3f8;
+      border: 1px solid #d5dbe8;
       border-radius: 6px;
-      color: #e2e8f0;
-      padding: 5px 8px;
+      color: #2c3e50;
+      padding: 6px 9px;
       font-size: 12px;
     }
     .set-field input:focus {
       outline: none;
-      border-color: #5b8def;
+      border-color: #667eea;
     }
 
-    /* ===== 时间行 ===== */
-    .time-row {
-      padding: 8px 14px;
-      font-family: "SF Mono", "Consolas", monospace;
+    /* ===== 白色信息卡片 ===== */
+    .card {
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .card-title {
       font-size: 12px;
-      color: #9aa8c0;
-      border-bottom: 1px solid #242c3d;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 8px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.35);
+      padding-bottom: 4px;
     }
-
-    /* ===== 分区 ===== */
-    .section {
-      padding: 8px 0;
-    }
-    .section-title {
-      padding: 2px 14px 6px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #7d8ca8;
-      letter-spacing: 0.5px;
-    }
-    .item {
+    .info-item {
       display: flex;
-      padding: 3px 14px;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px 0;
     }
-    .item .label {
-      flex: 0 0 42px;
-      color: #7d8ca8;
+    .info-label {
+      font-weight: 600;
+      color: #4a5568;
+      flex: 0 0 auto;
     }
-    .item .val {
-      flex: 1;
-      color: #cbd5e6;
+    .info-value {
+      font-weight: 700;
+      color: #667eea;
+      text-align: right;
       word-break: break-word;
     }
 
-    /* ===== 可能意外（高亮区块） ===== */
-    .section.surprise {
-      border-top: 1px solid #2a3247;
-      border-bottom: 1px solid #2a3247;
-      background: rgba(232, 160, 76, 0.05);
+    /* 意外卡（高亮橙） */
+    .card.surprise {
+      background: rgba(255, 247, 237, 0.95);
+      border: 1px solid rgba(245, 124, 0, 0.25);
     }
-    .section.surprise .section-title {
-      color: #e8a04c;
+    .card.surprise .card-title {
+      color: #f57c00;
+      border-bottom-color: rgba(245, 124, 0, 0.3);
     }
-    .section.surprise .label {
-      color: #c08a4e;
-    }
-    .section.surprise .val {
-      color: #f0c48a;
+    .card.surprise .info-value {
+      color: #e65100;
     }
 
-    /* ===== 角色卡片 ===== */
-    .empty {
-      padding: 4px 14px 10px;
-      color: #6b7a90;
-      font-size: 12px;
-    }
+    /* ===== 角色卡片（可折叠） ===== */
     .char-card {
-      margin: 6px 14px;
-      padding: 10px;
-      border: 1px solid #2a3247;
-      border-radius: 8px;
-      background: #1d2433;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
-    .char-head {
+    .char-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 9px 13px;
+      cursor: pointer;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-bottom: 6px;
+      align-items: center;
+      user-select: none;
     }
     .char-name {
-      font-weight: 600;
-      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .char-name .emoji {
+      font-size: 16px;
+    }
+    .char-name .rel-sub {
+      font-size: 10px;
+      font-weight: 400;
+      opacity: 0.85;
+    }
+    .char-head-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .badge {
-      font-size: 11px;
-      color: #3fb27f;
-      border: 1px solid rgba(63, 178, 127, 0.4);
-      border-radius: 8px;
-      padding: 0 7px;
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      padding: 1px 8px;
+      font-weight: 600;
     }
     .badge.off {
-      color: #6b7a90;
-      border-color: rgba(107, 122, 144, 0.4);
+      background: rgba(0, 0, 0, 0.18);
+      opacity: 0.7;
     }
-    .char-meta {
+    .toggle-icon {
+      font-size: 13px;
+      transition: transform 0.3s;
+    }
+    .char-card.collapsed .toggle-icon {
+      transform: rotate(-90deg);
+    }
+
+    /* 角色详情（折叠过渡） */
+    .char-details {
+      padding: 10px 13px;
+      max-height: 600px;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .char-card.collapsed .char-details {
+      max-height: 0;
+      padding: 0 13px;
+    }
+
+    /* ===== 好感度进度条 ===== */
+    .stat-label {
       display: flex;
-      gap: 12px;
-      font-size: 12px;
-      color: #9aa8c0;
-      margin-bottom: 6px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 11px;
     }
-    .char-meta .rel {
-      color: #7d8ca8;
+    .stat-name {
+      font-weight: 600;
+      color: #4a5568;
     }
-    .aff-bar {
-      height: 4px;
-      border-radius: 2px;
-      background: #2a3247;
+    .stat-value {
+      font-weight: 700;
+      color: #667eea;
+    }
+    .progress-bar {
+      height: 18px;
+      background: #e8ecf3;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+      margin-bottom: 8px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width 0.6s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      position: relative;
       overflow: hidden;
     }
-    .aff-fill {
+    .progress-fill::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
       height: 100%;
-      border-radius: 2px;
-      transition: width 0.4s ease;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+      animation: shine 2.2s infinite;
+    }
+    @keyframes shine {
+      to { left: 100%; }
+    }
+    /* 好感度颜色 */
+    .aff-high { background: linear-gradient(90deg, #ff6b9d, #c471ed); }
+    .aff-mid { background: linear-gradient(90deg, #ffb74d, #ff9800); }
+    .aff-low { background: linear-gradient(90deg, #42a5f5, #1976d2); }
+
+    /* 角色详情文字行 */
+    .detail-row {
+      padding: 2px 0;
+      font-size: 11px;
+      color: #4a5568;
+    }
+    .detail-row .dl {
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .empty {
+      padding: 6px;
+      color: #fff;
+      text-align: center;
+      font-size: 12px;
+      opacity: 0.9;
     }
 
     /* ===== 工具区 ===== */
     .tools {
       display: flex;
       gap: 8px;
-      padding: 10px 14px;
-      border-top: 1px solid #2a3247;
+      padding-top: 2px;
     }
     .tool-btn {
       flex: 1;
-      padding: 8px 0;
-      background: linear-gradient(180deg, #6b9bff 0%, #4a7de8 100%);
+      padding: 9px 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(240,243,250,0.95) 100%);
       border: none;
-      border-radius: 6px;
-      color: #fff;
+      border-radius: 8px;
+      color: #667eea;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
     }
     .tool-btn:hover {
-      filter: brightness(1.08);
+      background: #fff;
     }
     .tool-btn:disabled {
-      opacity: 0.5;
+      opacity: 0.55;
       cursor: not-allowed;
     }
     .tool-btn.small {
@@ -253,27 +350,28 @@
       font-size: 12px;
     }
     .tool-status {
-      padding: 0 14px 8px;
-      font-size: 12px;
-      color: #3fb27f;
+      padding: 6px 2px 0;
+      font-size: 11px;
+      color: #fff;
       word-break: break-word;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
     .tool-status.error {
-      color: #e06c75;
+      color: #ffe0e0;
     }
     .patch-box {
       display: none;
-      padding: 0 14px 10px;
+      padding-top: 8px;
     }
     .patch-box.open {
       display: block;
     }
     .patch-box textarea {
       width: 100%;
-      background: #1d2433;
-      border: 1px solid #2a3247;
-      border-radius: 6px;
-      color: #cbd5e6;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      color: #2c3e50;
       font-size: 12px;
       padding: 8px;
       margin-bottom: 6px;
@@ -314,34 +412,36 @@
       </div>
     </div>
 
-    <!-- 时间行 -->
-    <div class="time-row" id="time-row">—</div>
-
-    <!-- 当前场景 -->
-    <div class="section">
-      <div class="section-title">当前场景</div>
-      <div class="item"><span class="label">地点</span><span class="val" id="scene-location">—</span></div>
-      <div class="item"><span class="label">环境</span><span class="val" id="scene-atmosphere">—</span></div>
-      <div class="item"><span class="label">人员</span><span class="val" id="scene-people">—</span></div>
+    <!-- 世界信息卡 -->
+    <div class="card">
+      <div class="card-title">🌍 世界信息</div>
+      <div class="info-item"><span class="info-label">📅 时间</span><span class="info-value" id="info-time">—</span></div>
+      <div class="info-item"><span class="info-label">🏷 世界</span><span class="info-value" id="info-world">—</span></div>
+      <div class="info-item"><span class="info-label">🎯 进度</span><span class="info-value" id="info-progress">—</span></div>
     </div>
 
-    <!-- 可能意外 -->
-    <div class="section surprise">
-      <div class="section-title">可能意外</div>
-      <div class="item"><span class="label">人</span><span class="val" id="surprise-person">—</span></div>
-      <div class="item"><span class="label">结果</span><span class="val" id="surprise-result">—</span></div>
+    <!-- 当前场景卡 -->
+    <div class="card">
+      <div class="card-title">📍 当前场景</div>
+      <div class="info-item"><span class="info-label">地点</span><span class="info-value" id="scene-location">—</span></div>
+      <div class="info-item"><span class="info-label">环境</span><span class="info-value" id="scene-atmosphere">—</span></div>
+      <div class="info-item"><span class="info-label">人员</span><span class="info-value" id="scene-people">—</span></div>
     </div>
 
-    <!-- 角色 -->
-    <div class="section">
-      <div class="section-title">角色</div>
-      <div id="char-list"></div>
+    <!-- 可能意外卡 -->
+    <div class="card surprise">
+      <div class="card-title">⚠️ 可能意外</div>
+      <div class="info-item"><span class="info-label">人</span><span class="info-value" id="surprise-person">—</span></div>
+      <div class="info-item"><span class="info-label">结果</span><span class="info-value" id="surprise-result">—</span></div>
     </div>
+
+    <!-- 角色列表 -->
+    <div id="char-list"></div>
 
     <!-- 工具区 -->
     <div class="tools">
-      <button class="tool-btn" id="btn-beautify" type="button">美化正文</button>
-      <button class="tool-btn" id="btn-variable" type="button">处理变量</button>
+      <button class="tool-btn" id="btn-beautify" type="button">✨ 美化正文</button>
+      <button class="tool-btn" id="btn-variable" type="button">🔧 处理变量</button>
     </div>
     <div class="tool-status" id="beautify-status"></div>
     <div class="tool-status" id="variable-status"></div>
@@ -355,7 +455,7 @@
 
   <script>
   /* ================================================================
-     状态栏 · 实时变量（原生 HTML，符合前端美化规范）
+     状态栏 · 实时变量（紫色渐变美化版，参考卡视觉 + 可折叠角色卡）
      ================================================================ */
 
   /* ===== 工具函数 ===== */
@@ -377,7 +477,6 @@
 
   /* 读取 MVU 变量（主路径 getVariables，回退 getChatMessages 读消息 data） */
   function getMvuData() {
-    /* 方式1：MVU 官方 API */
     try {
       var TH = window.TavernHelper || (window.parent && window.parent.TavernHelper);
       if (TH && typeof TH.getVariables === 'function') {
@@ -386,7 +485,6 @@
       }
     } catch (e) { /* ignore */ }
 
-    /* 方式2：getChatMessages 读消息对象 data（文档要求方式） */
     try {
       var getMsgs = getGlobalFn('getChatMessages');
       var getCur = getGlobalFn('getCurrentMessageId');
@@ -405,28 +503,32 @@
 
   /* ===== 状态栏渲染 ===== */
 
+  /* 折叠状态记录：{角色键名: true}，刷新后保留 */
+  var collapsedMap = {};
+
   function affinityPercent(n) {
     return Math.round(((n + 100) / 200) * 100);
   }
-  function affinityColor(n) {
-    if (n > 20) return '#e06c75';
-    if (n >= 0) return '#e8a04c';
-    return '#5b8def';
+  function affinityClass(n) {
+    if (n > 20) return 'aff-high';
+    if (n >= 0) return 'aff-mid';
+    return 'aff-low';
   }
 
   function render() {
     var d = getMvuData();
 
-    /* 时间 */
+    /* 世界信息 */
     var t = d['游戏时间'] || {};
     var timeStr = safeGet(t['纪历体系']) + ' ' +
       safeGet(t['年']) + '-' + safeGet(t['月']) + '-' + safeGet(t['日']) + ' ' +
       safeGet(t['时']) + ':' + safeGet(t['分']);
-    document.getElementById('time-row').textContent = timeStr;
+    document.getElementById('info-time').textContent = timeStr;
 
-    /* 阶段 */
     var meta = d['元信息'] || {};
     document.getElementById('stage').textContent = safeGet(meta['当前阶段'], '—');
+    document.getElementById('info-world').textContent = safeGet(meta['世界类型']);
+    document.getElementById('info-progress').textContent = safeGet(meta['进度']);
 
     /* 当前场景 */
     var scene = d['当前场景'] || {};
@@ -443,45 +545,66 @@
     var chr = d['角色档案'] || {};
     var keys = Object.keys(chr);
     var listEl = document.getElementById('char-list');
+
     if (keys.length === 0) {
       listEl.innerHTML = '<div class="empty">暂无出场角色</div>';
     } else {
       var html = '';
       for (var i = 0; i < keys.length; i++) {
-        var c = chr[keys[i]] || {};
+        var key = keys[i];
+        var c = chr[key] || {};
         var name = safeGet(c['姓名'], '未知');
         var state = safeGet(c['状态'], '出场中');
         var aff = Number(safeGet((c['数值'] || {})['好感度'], 0));
         if (isNaN(aff)) aff = 0;
         var rel = safeGet(c['与User关系'], '');
         var pct = affinityPercent(aff);
-        var color = affinityColor(aff);
+        var acls = affinityClass(aff);
+        var isCollapsed = !!collapsedMap[key];
         var offCls = (state === '暂时退场') ? ' off' : '';
-        html += '<div class="char-card">'
-          + '<div class="char-head"><span class="char-name"></span><span class="badge' + offCls + '"></span></div>'
-          + '<div class="char-meta"><span class="aff">好感 ' + aff + '</span><span class="rel"></span></div>'
-          + '<div class="aff-bar"><div class="aff-fill"></div></div>'
+        var relSub = rel !== '—' && rel !== '' ? ' <span class="rel-sub">(' + rel + ')</span>' : '';
+
+        html += '<div class="char-card' + (isCollapsed ? ' collapsed' : '') + '" data-key="' + key + '">'
+          + '<div class="char-header">'
+          +   '<div class="char-name"><span class="emoji">👤</span><span class="nm"></span>' + relSub + '</div>'
+          +   '<div class="char-head-right"><span class="badge' + offCls + '"></span><span class="toggle-icon">▼</span></div>'
+          + '</div>'
+          + '<div class="char-details">'
+          +   '<div class="stat-label"><span class="stat-name">💝 好感度</span><span class="stat-value"></span></div>'
+          +   '<div class="progress-bar"><div class="progress-fill ' + acls + '"></div></div>'
+          +   '<div class="detail-row"><span class="dl">关系</span> · <span class="dr"></span></div>'
+          +   '<div class="detail-row"><span class="dl">简介</span> · <span class="dd"></span></div>'
+          +   '<div class="detail-row"><span class="dl">想法</span> · <span class="dt"></span></div>'
+          + '</div>'
           + '</div>';
       }
       listEl.innerHTML = html;
 
-      /* 填充角色名/状态/关系/进度条（用 textContent 防注入） */
+      /* 用 textContent 填充（防注入），并恢复折叠状态 */
       var cards = listEl.querySelectorAll('.char-card');
       for (var j = 0; j < cards.length; j++) {
-        var cj = chr[keys[j]] || {};
+        var kj = keys[j];
+        var cj = chr[kj] || {};
         var nm = safeGet(cj['姓名'], '未知');
         var st = safeGet(cj['状态'], '出场中');
         var af = Number(safeGet((cj['数值'] || {})['好感度'], 0));
         if (isNaN(af)) af = 0;
         var rl = safeGet(cj['与User关系'], '');
-        cards[j].querySelector('.char-name').textContent = nm;
-        var badge = cards[j].querySelector('.badge');
+        var intro = safeGet(cj['角色简介'], '');
+        var thought = safeGet(cj['当前内心想法'], '');
+
+        var card = cards[j];
+        card.querySelector('.nm').textContent = nm;
+        var badge = card.querySelector('.badge');
         badge.textContent = st;
         badge.className = 'badge' + ((st === '暂时退场') ? ' off' : '');
-        cards[j].querySelector('.rel').textContent = rl;
-        var fill = cards[j].querySelector('.aff-fill');
+        card.querySelector('.stat-value').textContent = af;
+        var fill = card.querySelector('.progress-fill');
         fill.style.width = affinityPercent(af) + '%';
-        fill.style.background = affinityColor(af);
+        fill.className = 'progress-fill ' + affinityClass(af);
+        card.querySelector('.dr').textContent = rl;
+        card.querySelector('.dd').textContent = intro;
+        card.querySelector('.dt').textContent = thought;
       }
     }
   }
@@ -507,9 +630,7 @@
   }
 
   function saveConfig() {
-    try {
-      localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-    } catch (e) { /* ignore */ }
+    try { localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); } catch (e) { /* ignore */ }
   }
 
   function syncConfigUI() {
@@ -667,8 +788,7 @@
 
   function bindEvents() {
     document.getElementById('gear-btn').addEventListener('click', function () {
-      var el = document.getElementById('settings');
-      el.classList.toggle('open');
+      document.getElementById('settings').classList.toggle('open');
     });
 
     document.getElementById('cfg-use-main').addEventListener('change', function () {
@@ -679,6 +799,22 @@
     document.getElementById('cfg-url').addEventListener('change', function () { config.url = this.value; saveConfig(); });
     document.getElementById('cfg-key').addEventListener('change', function () { config.key = this.value; saveConfig(); });
     document.getElementById('cfg-model').addEventListener('change', function () { config.model = this.value; saveConfig(); });
+
+    /* 角色卡折叠（事件委托，兼容刷新重建） */
+    document.getElementById('char-list').addEventListener('click', function (e) {
+      var header = e.target.closest ? e.target.closest('.char-header') : null;
+      if (!header) return;
+      var card = header.closest ? header.closest('.char-card') : null;
+      if (!card) return;
+      var key = card.getAttribute('data-key');
+      var willCollapse = !card.classList.contains('collapsed');
+      if (willCollapse) {
+        collapsedMap[key] = true;
+      } else {
+        delete collapsedMap[key];
+      }
+      card.classList.toggle('collapsed');
+    });
 
     document.getElementById('btn-beautify').addEventListener('click', beautifyMaintext);
     document.getElementById('btn-variable').addEventListener('click', processVariable);
@@ -697,7 +833,6 @@
     }
   }
 
-  /* 加载时机：用 jQuery ready（文档要求），回退 DOMContentLoaded */
   if (typeof $ === 'function') {
     $(function () { init(); });
   } else if (document.readyState === 'loading') {
