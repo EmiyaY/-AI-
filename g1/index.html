@@ -311,6 +311,23 @@
       color: #667eea;
     }
 
+    /* 详情小节标题 */
+    .detail-section {
+      font-size: 11px;
+      font-weight: 700;
+      color: #667eea;
+      margin: 9px 0 4px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(102, 126, 234, 0.35);
+    }
+    .detail-sub {
+      font-size: 10px;
+      font-weight: 600;
+      color: #8b95b3;
+      margin: 5px 0 2px;
+      padding-left: 8px;
+    }
+
     .empty {
       padding: 6px;
       color: #fff;
@@ -468,6 +485,16 @@
     return v;
   }
 
+  /* HTML 转义（防注入） */
+  function esc(s) {
+    return String(s === undefined || s === null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   /* 获取全局函数（兼容 iframe / parent） */
   function getGlobalFn(name) {
     try { if (window.parent && typeof window.parent[name] === 'function') return window.parent[name]; } catch (e) { /* ignore */ }
@@ -515,6 +542,69 @@
     return 'aff-low';
   }
 
+  /* 渲染 record（值为标量）→ 「· 键：值」行（用于性格） */
+  function renderKvRecord(rec) {
+    var ks = Object.keys(rec || {});
+    if (!ks.length) return '<div class="detail-row">· 无</div>';
+    var html = '';
+    for (var i = 0; i < ks.length; i++) {
+      html += '<div class="detail-row">· ' + esc(ks[i]) + '：' + esc(rec[ks[i]]) + '</div>';
+    }
+    return html;
+  }
+
+  /* 渲染 record（值为 {状态, 描述}）→ 「· 名：描述（状态）」行（用于穿搭/携带物品） */
+  function renderItemRecord(rec) {
+    var ks = Object.keys(rec || {});
+    if (!ks.length) return '<div class="detail-row">· 无</div>';
+    var html = '';
+    for (var i = 0; i < ks.length; i++) {
+      var it = rec[ks[i]] || {};
+      var desc = it['描述'] || '';
+      var st = it['状态'] || '';
+      var tail = (st && st !== '正常') ? '（' + esc(st) + '）' : '';
+      html += '<div class="detail-row">· ' + esc(ks[i]) + '：' + esc(desc) + tail + '</div>';
+    }
+    return html;
+  }
+
+  /* 构建角色详情（展示角色档案全部字段） */
+  function buildCharDetails(c) {
+    var body = c['身体信息'] || {};
+    var outfit = c['穿搭'] || {};
+    var sex = c['性爱观念'] || {};
+    var html = '';
+
+    html += '<div class="detail-row"><span class="dl">状态</span> · ' + esc(c['状态'] || '') + '</div>';
+    html += '<div class="detail-row"><span class="dl">关系</span> · ' + esc(c['与User关系'] || '') + '</div>';
+    html += '<div class="detail-row"><span class="dl">简介</span> · ' + esc(c['角色简介'] || '') + '</div>';
+    html += '<div class="detail-row"><span class="dl">想法</span> · ' + esc(c['当前内心想法'] || '') + '</div>';
+
+    html += '<div class="detail-section">😼 性格</div>';
+    html += renderKvRecord(c['性格']);
+
+    html += '<div class="detail-section">📏 身体信息</div>';
+    html += '<div class="detail-row">年龄 ' + esc(body['年龄'] || '') + ' · 身高 ' + esc(body['身高'] || '') + ' cm · 体重 ' + esc(body['体重'] || '') + ' kg</div>';
+    html += '<div class="detail-row"><span class="dl">外貌</span> · ' + esc(body['外貌描述'] || '') + '</div>';
+    if (body['色气点']) html += '<div class="detail-row"><span class="dl">色气点</span> · ' + esc(body['色气点']) + '</div>';
+
+    html += '<div class="detail-section">👗 穿搭</div>';
+    html += '<div class="detail-sub">外穿</div>' + renderItemRecord(outfit['外穿']);
+    html += '<div class="detail-sub">内搭</div>' + renderItemRecord(outfit['内搭']);
+    html += '<div class="detail-sub">装饰</div>' + renderItemRecord(outfit['装饰']);
+    if (outfit['色气点']) html += '<div class="detail-row"><span class="dl">色气点</span> · ' + esc(outfit['色气点']) + '</div>';
+
+    html += '<div class="detail-section">💗 性爱观念</div>';
+    html += '<div class="detail-row"><span class="dl">性爱观</span> · ' + esc(sex['性爱观'] || '') + '</div>';
+    html += '<div class="detail-row"><span class="dl">接受条件</span> · ' + esc(sex['接受条件'] || '') + '</div>';
+    html += '<div class="detail-row"><span class="dl">偏好</span> · ' + esc(sex['偏好'] || '') + '</div>';
+
+    html += '<div class="detail-section">🎒 携带物品</div>';
+    html += renderItemRecord(c['携带物品']);
+
+    return html;
+  }
+
   function render() {
     var d = getMvuData();
 
@@ -553,59 +643,30 @@
       for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
         var c = chr[key] || {};
-        var name = safeGet(c['姓名'], '未知');
-        var state = safeGet(c['状态'], '出场中');
-        var aff = Number(safeGet((c['数值'] || {})['好感度'], 0));
+        var name = c['姓名'] || '未知';
+        var state = c['状态'] || '出场中';
+        var aff = Number(c['数值'] && c['数值']['好感度']);
         if (isNaN(aff)) aff = 0;
-        var rel = safeGet(c['与User关系'], '');
+        var rel = c['与User关系'] || '';
         var pct = affinityPercent(aff);
         var acls = affinityClass(aff);
         var isCollapsed = !!collapsedMap[key];
         var offCls = (state === '暂时退场') ? ' off' : '';
-        var relSub = rel !== '—' && rel !== '' ? ' <span class="rel-sub">(' + rel + ')</span>' : '';
+        var relSub = rel ? ' <span class="rel-sub">(' + esc(rel) + ')</span>' : '';
 
-        html += '<div class="char-card' + (isCollapsed ? ' collapsed' : '') + '" data-key="' + key + '">'
+        html += '<div class="char-card' + (isCollapsed ? ' collapsed' : '') + '" data-key="' + esc(key) + '">'
           + '<div class="char-header">'
-          +   '<div class="char-name"><span class="emoji">👤</span><span class="nm"></span>' + relSub + '</div>'
-          +   '<div class="char-head-right"><span class="badge' + offCls + '"></span><span class="toggle-icon">▼</span></div>'
+          +   '<div class="char-name"><span class="emoji">👤</span>' + esc(name) + relSub + '</div>'
+          +   '<div class="char-head-right"><span class="badge' + offCls + '">' + esc(state) + '</span><span class="toggle-icon">▼</span></div>'
           + '</div>'
           + '<div class="char-details">'
-          +   '<div class="stat-label"><span class="stat-name">💝 好感度</span><span class="stat-value"></span></div>'
-          +   '<div class="progress-bar"><div class="progress-fill ' + acls + '"></div></div>'
-          +   '<div class="detail-row"><span class="dl">关系</span> · <span class="dr"></span></div>'
-          +   '<div class="detail-row"><span class="dl">简介</span> · <span class="dd"></span></div>'
-          +   '<div class="detail-row"><span class="dl">想法</span> · <span class="dt"></span></div>'
+          +   '<div class="stat-label"><span class="stat-name">💝 好感度</span><span class="stat-value">' + aff + '</span></div>'
+          +   '<div class="progress-bar"><div class="progress-fill ' + acls + '" style="width:' + pct + '%"></div></div>'
+          +   buildCharDetails(c)
           + '</div>'
           + '</div>';
       }
       listEl.innerHTML = html;
-
-      /* 用 textContent 填充（防注入），并恢复折叠状态 */
-      var cards = listEl.querySelectorAll('.char-card');
-      for (var j = 0; j < cards.length; j++) {
-        var kj = keys[j];
-        var cj = chr[kj] || {};
-        var nm = safeGet(cj['姓名'], '未知');
-        var st = safeGet(cj['状态'], '出场中');
-        var af = Number(safeGet((cj['数值'] || {})['好感度'], 0));
-        if (isNaN(af)) af = 0;
-        var rl = safeGet(cj['与User关系'], '');
-        var intro = safeGet(cj['角色简介'], '');
-        var thought = safeGet(cj['当前内心想法'], '');
-
-        var card = cards[j];
-        card.querySelector('.nm').textContent = nm;
-        var badge = card.querySelector('.badge');
-        badge.textContent = st;
-        badge.className = 'badge' + ((st === '暂时退场') ? ' off' : '');
-        card.querySelector('.stat-value').textContent = af;
-        var fill = card.querySelector('.progress-fill');
-        fill.style.width = affinityPercent(af) + '%';
-        fill.className = 'progress-fill ' + affinityClass(af);
-        card.querySelector('.dr').textContent = rl;
-        card.querySelector('.dd').textContent = intro;
-        card.querySelector('.dt').textContent = thought;
-      }
     }
   }
 
